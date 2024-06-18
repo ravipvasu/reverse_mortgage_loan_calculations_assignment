@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reverse Mortgage Calculator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("form").on('change', function(event) {
+                $.ajax({
+                    url: '',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(data) {
+                        $('h2').text('Principal Limit: ' + data.principal_limit);
+                        $('#errors').empty();
+                    },
+                    error: function(xhr) {
+                        let errors = xhr.responseJSON.errors;
+                        console.log("errors", errors);
+                        let errorList = '<ul>';
+                        for (let field in errors) {
+                            errorList += `<li>${field}: ${errors[field].join(', ')}</li>`;
+                        }
+                        errorList += '</ul>';
+                        $('#errors').html(errorList);
+                        $('h2').text('Principal Limit: ');
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Reverse Mortgage Calculator</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="errors"></div>
+    <h2>Principal Limit: </h2>
+</body>
+</html>
